@@ -1,0 +1,2 @@
+FLASK_APP=product_info_flask_restful
+FLASK_ENV=development
