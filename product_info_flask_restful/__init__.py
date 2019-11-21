@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_restful import Api
 from .extensions import mongo,JSONEncoder
 
 def create_app(config_object='product_info_flask_restful.settings'):
@@ -7,5 +8,8 @@ def create_app(config_object='product_info_flask_restful.settings'):
 
     mongo.init_app(app)
     app.json_encoder = JSONEncoder
+    api = Api(app)
+    from .api.Products import ProductList
 
+    api.add_resource(ProductList, '/products')
     return app
