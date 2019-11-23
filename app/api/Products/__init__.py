@@ -1,4 +1,4 @@
-from flask import Blueprint
+from flask import Blueprint,request
 from flask_restful import Api, Resource, reqparse, fields, marshal
 from app.extensions import mongo
 from bson.objectid import ObjectId
@@ -22,7 +22,10 @@ class ProductList(Resource):
             resp.append(doc)
         return  [marshal(task, product_fields) for task in resp]
     def post(self):
-        pass
+        collection = mongo.db.products
+        content = request.get_json()
+        resp = collection.insert(content)
+        return str(resp)
 
 
 class Product(Resource):
@@ -31,9 +34,14 @@ class Product(Resource):
         resp = collection.find_one({ "_id": ObjectId(oid=str(id)) })
         return marshal(resp, product_fields)
     def patch(self,id):
-        pass
+        collection = mongo.db.products
+        content = request.get_json()
+        resp = collection.update_one({ "_id": ObjectId(oid=str(id)) }, {"$set": content }, upsert=True)
+        return resp.modified_count
     def delete(self,id):
-        pass
+        collection = mongo.db.products
+        resp = collection.delete_one({ "_id": ObjectId(oid=str(id)) })
+        return resp.deleted_count
 
 
 api.add_resource(ProductList, '/products')
